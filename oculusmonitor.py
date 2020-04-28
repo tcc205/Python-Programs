@@ -3,32 +3,35 @@ import json
 import time
 from dhooks import Webhook, Embed
 import math
+import datetime
+
+now = datetime.datetime.now()
 
 
 def sendHooks(value, type, link):
   stock = (value / 25)
   amount = math.floor(stock)
-  hook = Webhook('https://discordapp.com/api/webhooks/704560730749272064/jFr8w0aP5gxOZL0ImAJb53F94xWAxfezRk3cyD3Y9E0msBPSFwQSv_PpqR-g4XV3pupx')
+  if amount != 0:
+    hook = Webhook('https://discordapp.com/api/webhooks/704560730749272064/jFr8w0aP5gxOZL0ImAJb53F94xWAxfezRk3cyD3Y9E0msBPSFwQSv_PpqR-g4XV3pupx')
 
-  embed = Embed(
-    #description='Oculus proxies restocked ' + str(numpacks) + " packs of " + type,
-    color=0x5CDBF0,
-    timestamp='now'  # sets the timestamp to current time
-  )
+    embed = Embed(
+      #description='Oculus proxies restocked ' + str(numpacks) + " packs of " + type,
+      color=0x5CDBF0,
+      timestamp='now'  # sets the timestamp to current time
+    )
 
-  image1 = 'https://pbs.twimg.com/profile_images/1000760087546392576/UJBqUta8.jpg'
-  image2 = 'https://pbs.twimg.com/profile_images/1000760087546392576/UJBqUta8.jpg'
+    image1 = 'https://pbs.twimg.com/profile_images/1000760087546392576/UJBqUta8.jpg'
+    image2 = 'https://pbs.twimg.com/profile_images/1000760087546392576/UJBqUta8.jpg'
 
-  embed.set_author(name='Oculus Proxies Restock\n-->CLICK ME<--', icon_url=image1, url=link)
-  embed.add_field(name='Type', value=type)
-  embed.add_field(name='Amount\n(sold in 25x)', value=str(amount))
-  embed.set_footer(text='Made by @thecanoechief', icon_url=image1)
+    embed.set_author(name='Oculus Proxies Restock\n-->CLICK ME<--', icon_url=image1, url=link)
+    embed.add_field(name='Type', value=type)
+    embed.add_field(name='Amount\n(sold in 25x)', value=str(amount))
+    embed.set_footer(text='Made by @thecanoechief', icon_url=image1)
 
-  embed.set_thumbnail(image1)
-  embed.set_image(image2)
+    embed.set_thumbnail(image1)
+    embed.set_image(image2)
 
-  hook.send("@everyone", embed=embed)
-  stockRequest()
+    hook.send("@everyone", embed=embed)
 
 def stockRequest():
   url = "https://oculusproxies.com/proxyconfig/getProxyStockCount"
@@ -48,23 +51,25 @@ def stockRequest():
   }
 
   proxies = {
-   "http" : "http://Ghd897!a113:TDv7iMyW@51.81.97.119:33128",
-   "https": "http://Ghd897!a113:TDv7iMyW@51.81.97.119:33128",
+   "http" : "http://208.202.246.109:65073",
+   "https": "http://208.202.246.109:65073",
   }
 
   response = requests.request("GET", url, headers=headers, data = payload, proxies=proxies)
   resp = response.text
   respDict = json.loads(resp)
+  print(respDict)
   nyPremium(respDict)
-  laPremium(respDict)
-  nyRegular(respDict)
-  chiRegular(respDict)
-  vaRegular(respDict)
+
 
 def nyPremium(respDict):
-  nypremstock = 1
   nyprem = 'NewYork_Premium'
+  for key, value in respDict.items():
+    if key == nyprem:
+      nypremstock = value
+      break
   running = True
+  time.sleep(0.5)
   while running == True:
     for key, value in respDict.items():
       if key == nyprem:
@@ -73,18 +78,23 @@ def nyPremium(respDict):
           link = 'https://oculusproxies.com/premium_pricing'
           sendHooks(value, type, link)
           nypremstock = value
+          laPremium(respDict)
           running = True
           break
         else:
-          print("no restock found")
-          time.sleep(4)
+          print("no restock found nyprem")
           nypremstock = value
+          laPremium(respDict)
           break
 
 def laPremium(respDict):
-  lapremstock = 0
   laprem = 'Los_Angeles_Premium'
+  for key, value in respDict.items():
+    if key == laprem:
+      lapremstock = value
+      break
   running = True
+  time.sleep(0.5)
   while running == True:
     for key, value in respDict.items():
       if key == laprem:
@@ -93,19 +103,23 @@ def laPremium(respDict):
           link = 'https://oculusproxies.com/premium_pricing'
           sendHooks(value, type, link)
           lapremstock = value
+          nyRegular(respDict)
           running = True
           break
         else:
-          print("no restock found")
+          print("no restock found laprem")
           lapremstock = value
-          time.sleep(4)
-          stockRequest()
+          nyRegular(respDict)
           break
 
 def nyRegular(respDict):
-  nyRegstock = 0
   nyreg = 'NewYork'
+  for key, value in respDict.items():
+    if key == nyreg:
+      nyRegstock = value
+      break
   running = True
+  time.sleep(0.5)
   while running == True:
     for key, value in respDict.items():
       if key == nyreg:
@@ -115,39 +129,48 @@ def nyRegular(respDict):
           sendHooks(value, type, link)
           nyRegstock = value
           running = True
+          chiRegular(respDict)
           break
         else:
-          print("no restock found")
+          print("no restock found nyreg")
           nyRegstock = value
-          time.sleep(4)
-          stockRequest()
+          chiRegular(respDict)
           break
 
 def chiRegular(respDict):
-  chiRegstock = 0
   chireg = 'Chicago'
+  for key, value in respDict.items():
+    if key == chireg:
+      chiRegstock = value
+      break
   running = True
+  time.sleep(0.5)
   while running == True:
     for key, value in respDict.items():
       if key == chireg:
         if value > chiRegstock:
           type = 'Chicago Regular'
           link = 'https://oculusproxies.com/pricing'
+          print("Restock found chireg")
           sendHooks(value, type, link)
           chiRegstock = value
           running = True
-          stockRequest()
+          vaRegular(respDict)
           break
         else:
-          print("no restock found")
+          print("no restock found chireg")
           chiRegstock = value
-          time.sleep(4)
+          vaRegular(respDict)
           break
 
 def vaRegular(respDict):
-  vaRegstock = 0
   vareg = 'Virginia'
+  for key, value in respDict.items():
+    if key == vareg:
+      vaRegstock = value
+      break
   running = True
+  time.sleep(0.5)
   while running == True:
     for key, value in respDict.items():
       if key == vareg:
@@ -157,9 +180,10 @@ def vaRegular(respDict):
           sendHooks(value, type, link)
           vaRegstock = value
           running = True
+          stockRequest()
           break
         else:
-          print("no restock found")
+          print("no restock found vareg")
           vaRegstock = value
           time.sleep(4)
           stockRequest()
