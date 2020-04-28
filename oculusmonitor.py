@@ -1,40 +1,34 @@
 import requests
 import json
 import time
-from discord_webhooks import DiscordWebhooks
+from dhooks import Webhook, Embed
+import math
 
 
-def sendHooks():
+def sendHooks(value, type, link):
+  stock = (value / 25)
+  amount = math.floor(stock)
+  hook = Webhook('https://discordapp.com/api/webhooks/704560730749272064/jFr8w0aP5gxOZL0ImAJb53F94xWAxfezRk3cyD3Y9E0msBPSFwQSv_PpqR-g4XV3pupx')
 
-  # Webhook URL for your Discord channel.
-  WEBHOOK_URL = 'https://discordapp.com/api/webhooks/586388906400808970/-ejCZGhvPk943qo9iq3vNLjWHGIJz69gFlDHu54B2LABcH28EvK3oZ9mALLh-L-a1i4_'
+  embed = Embed(
+    #description='Oculus proxies restocked ' + str(numpacks) + " packs of " + type,
+    color=0x5CDBF0,
+    timestamp='now'  # sets the timestamp to current time
+  )
 
-  webhook = DiscordWebhooks(WEBHOOK_URL)
+  image1 = 'https://pbs.twimg.com/profile_images/1000760087546392576/UJBqUta8.jpg'
+  image2 = 'https://pbs.twimg.com/profile_images/1000760087546392576/UJBqUta8.jpg'
 
-  webhook.set_content(content='The best cat ever is...', title='Montezuma!', description='Seriously!', \
-                      url='http://github.com/JamesIves', color=0xF58CBA, timestamp='2018-11-09T04:10:42.039Z')
+  embed.set_author(name='Oculus Proxies Restock\n-->CLICK ME<--', icon_url=image1, url=link)
+  embed.add_field(name='Type', value=type)
+  embed.add_field(name='Amount\n(sold in 25x)', value=str(amount))
+  embed.set_footer(text='Made by @thecanoechief', icon_url=image1)
 
-  # Attaches an image
-  webhook.set_image(url='https://avatars1.githubusercontent.com/u/10888441?s=460&v=4')
+  embed.set_thumbnail(image1)
+  embed.set_image(image2)
 
-  # Attaches a thumbnail
-  webhook.set_thumbnail(url='https://avatars1.githubusercontent.com/u/10888441?s=460&v=4')
-
-  # Attaches an author
-  webhook.set_author(name='James Ives', url='https://jamesiv.es',
-                     icon_url='https://avatars1.githubusercontent.com/u/10888441?s=460&v=4')
-
-  # Attaches a footer
-  webhook.set_footer(text='Footer', icon_url='https://avatars1.githubusercontent.com/u/10888441?s=460&v=4')
-
-  # Appends a field
-  webhook.add_field(name='Field', value='Value!')
-
-  webhook.send()
-
-
-
-sendHooks()
+  hook.send("@everyone", embed=embed)
+  stockRequest()
 
 def stockRequest():
   url = "https://oculusproxies.com/proxyconfig/getProxyStockCount"
@@ -61,24 +55,120 @@ def stockRequest():
   response = requests.request("GET", url, headers=headers, data = payload, proxies=proxies)
   resp = response.text
   respDict = json.loads(resp)
+  nyPremium(respDict)
+  laPremium(respDict)
+  nyRegular(respDict)
+  chiRegular(respDict)
+  vaRegular(respDict)
 
-def nyPremium():
+def nyPremium(respDict):
   nypremstock = 1
   nyprem = 'NewYork_Premium'
   running = True
   while running == True:
     for key, value in respDict.items():
       if key == nyprem:
-        if value != nypremstock:
-          sendHooks()
-          print("hi")
+        if value > nypremstock:
+          type = 'NY Premium'
+          link = 'https://oculusproxies.com/premium_pricing'
+          sendHooks(value, type, link)
           nypremstock = value
           running = True
           break
         else:
           print("no restock found")
-          time.sleep(1.5)
+          time.sleep(4)
+          nypremstock = value
           break
 
+def laPremium(respDict):
+  lapremstock = 0
+  laprem = 'Los_Angeles_Premium'
+  running = True
+  while running == True:
+    for key, value in respDict.items():
+      if key == laprem:
+        if value > lapremstock:
+          type = 'LA Premium'
+          link = 'https://oculusproxies.com/premium_pricing'
+          sendHooks(value, type, link)
+          lapremstock = value
+          running = True
+          break
+        else:
+          print("no restock found")
+          lapremstock = value
+          time.sleep(4)
+          stockRequest()
+          break
 
+def nyRegular(respDict):
+  nyRegstock = 0
+  nyreg = 'NewYork'
+  running = True
+  while running == True:
+    for key, value in respDict.items():
+      if key == nyreg:
+        if value > nyRegstock:
+          type = 'NY Regular'
+          link = 'https://oculusproxies.com/pricing'
+          sendHooks(value, type, link)
+          nyRegstock = value
+          running = True
+          break
+        else:
+          print("no restock found")
+          nyRegstock = value
+          time.sleep(4)
+          stockRequest()
+          break
+
+def chiRegular(respDict):
+  chiRegstock = 0
+  chireg = 'Chicago'
+  running = True
+  while running == True:
+    for key, value in respDict.items():
+      if key == chireg:
+        if value > chiRegstock:
+          type = 'Chicago Regular'
+          link = 'https://oculusproxies.com/pricing'
+          sendHooks(value, type, link)
+          chiRegstock = value
+          running = True
+          stockRequest()
+          break
+        else:
+          print("no restock found")
+          chiRegstock = value
+          time.sleep(4)
+          break
+
+def vaRegular(respDict):
+  vaRegstock = 0
+  vareg = 'Virginia'
+  running = True
+  while running == True:
+    for key, value in respDict.items():
+      if key == vareg:
+        if value > vaRegstock:
+          type = 'Virginia Regular'
+          link = 'https://oculusproxies.com/pricing'
+          sendHooks(value, type, link)
+          vaRegstock = value
+          running = True
+          break
+        else:
+          print("no restock found")
+          vaRegstock = value
+          time.sleep(4)
+          stockRequest()
+          break
+
+#value = 76
+#link = 'https://oculusproxies.com/premium_pricing'
+#type = 'NY Premium'
+#sendHooks(value, type, link)
+
+stockRequest()
 
