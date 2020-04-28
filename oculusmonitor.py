@@ -32,6 +32,8 @@ def sendHooks(value, type, link):
     embed.set_image(image2)
 
     hook.send("@everyone", embed=embed)
+    print("Restock found for " + type + "\nWebhook executed")
+    time.sleep(0.5)
 
 def stockRequest():
   url = "https://oculusproxies.com/proxyconfig/getProxyStockCount"
