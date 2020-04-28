@@ -185,7 +185,7 @@ def vaRegular(respDict):
         else:
           print("no restock found vareg")
           vaRegstock = value
-          time.sleep(4)
+          time.sleep(10)
           stockRequest()
           break
 
