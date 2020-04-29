@@ -86,31 +86,31 @@ def nyPremium(respDict):
         else:
           print("no restock found nyprem")
           nypremstock = value
-          laPremium(respDict)
+          vapremsup(respDict)
           break
 
-def laPremium(respDict):
-  laprem = 'Los_Angeles_Premium'
+def vapremsup(respDict):
+  vapremsup = 'Los_Angeles_Premium'
   for key, value in respDict.items():
-    if key == laprem:
-      lapremstock = value
+    if key == vapremsup:
+      vapremsupstock = value
       break
   running = True
   time.sleep(0.5)
   while running == True:
     for key, value in respDict.items():
-      if key == laprem:
-        if value > lapremstock:
-          type = 'LA Premium'
+      if key == vapremsup:
+        if value > vapremsupstock:
+          type = 'VA Premium Supreme 208'
           link = 'https://oculusproxies.com/premium_pricing'
           sendHooks(value, type, link)
-          lapremstock = value
+          vapremsupstock = value
           nyRegular(respDict)
           running = True
           break
         else:
-          print("no restock found laprem")
-          lapremstock = value
+          print("no restock found vaprem supreme")
+          vapremsupstock = value
           nyRegular(respDict)
           break
 
