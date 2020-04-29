@@ -191,7 +191,7 @@ def vaRegular(respDict):
           stockRequest()
           break
 
-#value = 76
+#value = 77
 #link = 'https://oculusproxies.com/premium_pricing'
 #type = 'NY Premium'
 #sendHooks(value, type, link)
